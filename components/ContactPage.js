@@ -14,6 +14,7 @@ import {
 } from "react-native";
 let user = null;
 export default function ContactPage({ route, navigation }) {
+  console.log("Route: ", route);
   const [notes, setNotes] = useState([
     {
       id: "1",
@@ -68,22 +69,34 @@ export default function ContactPage({ route, navigation }) {
       level: "Urgent",
     },
   ]);
-  if (route.params.user.address != "") {
-    user = route.params.user;
-  } else {
-    user = new Contact(
-      2,
-      "Test1@nd.edu",
-      "Billy",
-      "Smith",
-      "9122347890",
-      "1349 E Ewing Ave, South Bend, IN 46613",
-      "normal",
-      "#Group 1",
-      "BS",
-      "Notes"
-    );
-  }
+  user = new Contact(
+    2,
+    "Test1@nd.edu",
+    "Billy",
+    "Smith",
+    "9122347890",
+    "1349 E Ewing Ave, South Bend, IN 46613",
+    "normal",
+    "#Group 1",
+    "BS",
+    "Notes"
+  );
+  // if (route.params.user.address == "") {
+  //   user = route.params.user;
+  // } else {
+  //   user = new Contact(
+  //     2,
+  //     "Test1@nd.edu",
+  //     "Billy",
+  //     "Smith",
+  //     "9122347890",
+  //     "1349 E Ewing Ave, South Bend, IN 46613",
+  //     "normal",
+  //     "#Group 1",
+  //     "BS",
+  //     "Notes"
+  //   );
+  // }
  
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -299,5 +312,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "stretch",
     backgroundColor: "#ffff",
+    marginTop: 50,
   },
 });
