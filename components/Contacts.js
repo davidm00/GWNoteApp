@@ -10,7 +10,7 @@ import { Link } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Contact } from "./Classes/Contact";
 import ContactsTopBar from "./ContactsTopBar";
-import IndividualContact from "./IndividualContact";
+import ContactDetails from "./ContactDetails";
 
 export default function Contacts({ navigation: { navigate } }) {
   const [contacts, setContants] = useState([ 
@@ -195,7 +195,7 @@ export default function Contacts({ navigation: { navigate } }) {
         sections={getData()}
         renderItem={({ item }) => (
           <View>
-            <TouchableOpacity style={styles.row} onPress={() => navigate('IndividualContact')}>
+            <TouchableOpacity style={styles.row} onPress={() => navigate('ContactDetails')}>
               <Text>{item.name}</Text>
             </TouchableOpacity>
      

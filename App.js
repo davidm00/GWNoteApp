@@ -14,7 +14,7 @@ import CreateAccount from "./components/CreateAccount";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import Profile from "./components/Profile";
-import IndividualContact from "./components/IndividualContact";
+import ContactDetails from "./components/ContactDetails";
 import ContactPage from './components/ContactPage';
 import AddContact from './components/AddContact'
 
@@ -105,8 +105,8 @@ export default function App() {
         />
 
         <Stack.Screen 
-          name="IndividualContact"
-          component={IndividualContact}
+          name="ContactDetails"
+          component={ContactDetails}
         />
         
         <Stack.Screen
