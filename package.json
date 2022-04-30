@@ -23,7 +23,12 @@
     "react-native-reanimated": "~2.2.0",
     "react-native-safe-area-context": "3.3.2",
     "react-native-safe-area-view": "^0.14.9",
+<<<<<<< HEAD
     "react-native-screens": "~3.8.0",
+=======
+    "react-native-screens": "^3.9.0",
+    "react-native-sqlite-storage": "^6.0.1",
+>>>>>>> dm/db
     "react-native-web": "0.17.1",
     "react-navigation": "^4.4.4",
     "react-navigation-stack": "^2.10.4",

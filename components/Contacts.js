@@ -1,171 +1,184 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
   SectionList,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import { Link } from "@react-navigation/native";
 import { ScrollView } from "react-native-gesture-handler";
 import { Contact } from "./Classes/Contact";
 import ContactsTopBar from "./ContactsTopBar";
+<<<<<<< HEAD
 import ContactDetails from "./ContactDetails";
 import ContactPage from "./ContactPage";
+=======
+import IndividualContact from "./IndividualContact";
+import { openDatabase } from 'react-native-sqlite-storage';
+import { getDBConnection, createTable } from "../backend/test";
+>>>>>>> dm/db
 
 export default function Contacts({ navigation: { navigate } }) {
-  const [contacts, setContants] = useState([ 
+  const [contacts, setContants] = useState([
     {
       index: 0,
-      name: "Danny Sullivan"
+      name: "Danny Sullivan",
     },
     {
       index: 1,
-      name: "Jesse Hooper"
+      name: "Jesse Hooper",
     },
     {
       index: 2,
-      name: "Reid Zavala"
+      name: "Reid Zavala",
     },
     {
       index: 3,
-      name: "Milo Alvarado"
+      name: "Milo Alvarado",
     },
     {
       index: 4,
-      name: "Tiara Hinton"
+      name: "Tiara Hinton",
     },
     {
       index: 5,
-      name: "Zion Bowers"
+      name: "Zion Bowers",
     },
     {
       index: 6,
-      name: "Rebekah Case"
+      name: "Rebekah Case",
     },
     {
       index: 7,
-      name: "Landin Landry"
+      name: "Landin Landry",
     },
     {
       index: 8,
-      name: "Nevaeh Hicks"
+      name: "Nevaeh Hicks",
     },
     {
       index: 9,
-      name: "Shyanne Kerr"
+      name: "Shyanne Kerr",
     },
     {
       index: 10,
-      name: "Yaretzi Bryan"
+      name: "Yaretzi Bryan",
     },
     {
       index: 11,
-      name: "Ramos Bauer"
+      name: "Ramos Bauer",
     },
     {
       index: 12,
-      name: "Humberto Lester"
+      name: "Humberto Lester",
     },
     {
       index: 13,
-      name: "Sienna Knight"
+      name: "Sienna Knight",
     },
     {
       index: 14,
-      name: "Allen Jensen"
+      name: "Allen Jensen",
     },
     {
       index: 15,
-      name: "Shaniya Wood"
+      name: "Shaniya Wood",
     },
     {
       index: 16,
-      name: "Brielle Pacheco"
+      name: "Brielle Pacheco",
     },
     {
       index: 17,
-      name: "Mira Fry"
+      name: "Mira Fry",
     },
     {
       index: 18,
-      name: "Rachel Beck"
+      name: "Rachel Beck",
     },
     {
       index: 19,
-      name: "Lina Bowers"
+      name: "Lina Bowers",
     },
     {
       index: 20,
-      name: "Vance Nichols"
+      name: "Vance Nichols",
     },
     {
       index: 21,
-      name: "Elian Herring"
+      name: "Elian Herring",
     },
     {
       index: 22,
-      name: "Kristin Estes"
+      name: "Kristin Estes",
     },
     {
       index: 23,
-      name: "Trevor Beasley"
+      name: "Trevor Beasley",
     },
     {
       index: 24,
-      name: "Weston Haynes"
+      name: "Weston Haynes",
     },
     {
       index: 25,
-      name: "Dayton Ferguson"
+      name: "Dayton Ferguson",
     },
     {
       index: 26,
-      name: "Gemma Harper"
+      name: "Gemma Harper",
     },
     {
       index: 27,
-      name: "Jordan Frye"
+      name: "Jordan Frye",
     },
     {
       index: 28,
-      name: "Charlie Tyler"
+      name: "Charlie Tyler",
     },
     {
       index: 29,
-      name: "Maeve Graves"
+      name: "Maeve Graves",
     },
     {
       index: 30,
-      name: "Ronan Mills"
+      name: "Ronan Mills",
     },
     {
       index: 31,
-      name: "Donovan Riddle"
+      name: "Donovan Riddle",
     },
     {
       index: 32,
-      name: "Matteo Zuniga"
+      name: "Matteo Zuniga",
     },
     {
       index: 33,
-      name: "Denise Booth"
+      name: "Denise Booth",
     },
     {
       index: 34,
-      name: "Audrey Mill"
+      name: "Audrey Mill",
     },
     {
       index: 35,
-      name: "Austin Humphrey"
+      name: "Austin Humphrey",
     },
     {
       index: 36,
-      name: "Amy Hills"
+      name: "Amy Hills",
+    },
+  ]);
+
+  const getWorkers = async () => {
+    try {
+      const db = await getDBConnection();
+      await createTable(db);
+    } catch (error) {
+      console.error(error);
     }
-
-  ])
-
+  };
 
   const getData = () => {
     let contactsArr = [];
@@ -173,10 +186,10 @@ export default function Contacts({ navigation: { navigate } }) {
     for (let i = 0; i < 26; i++) {
       let currChar = String.fromCharCode(aCode + i);
       let obj = {
-        title: currChar
+        title: currChar,
       };
 
-      let currContacts = contacts.filter(item => {
+      let currContacts = contacts.filter((item) => {
         return item.name[0].toUpperCase() === currChar;
       });
       if (currContacts.length > 0) {
@@ -189,18 +202,36 @@ export default function Contacts({ navigation: { navigate } }) {
     return contactsArr;
   };
 
-  return(
-    <View style={styles.container}>
+  // useEffect(() => {
+  //   getWorkers();
+  // }, [])
 
+  return (
+
+    <View style={styles.container}>
       <SectionList
         sections={getData()}
         renderItem={({ item }) => (
           <View>
+<<<<<<< HEAD
             <TouchableOpacity style={styles.row} onPress={() => navigate('ContactPage')}>
+=======
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => navigate("IndividualContact")}
+            >
+>>>>>>> dm/db
               <Text>{item.name}</Text>
             </TouchableOpacity>
-     
-            <View style={{width: '90%', alignSelf: 'center', height: 1, backgroundColor: '#efefef'}}/> 
+
+            <View
+              style={{
+                width: "90%",
+                alignSelf: "center",
+                height: 1,
+                backgroundColor: "#efefef",
+              }}
+            />
           </View>
         )}
         renderSectionHeader={({ section }) => (
@@ -208,10 +239,9 @@ export default function Contacts({ navigation: { navigate } }) {
             <Text>{section.title}</Text>
           </View>
         )}
-        keyExtractor={item => item.index}
+        keyExtractor={(item) => item.index}
       />
     </View>
-    
   );
 }
 
@@ -224,11 +254,11 @@ const styles = StyleSheet.create({
   },
   row: {
     paddingHorizontal: 20,
-    paddingVertical: 10, 
+    paddingVertical: 10,
   },
   sectionHeader: {
     backgroundColor: "#efefef",
     paddingHorizontal: 20,
-    paddingVertical: 10, 
-  }
+    paddingVertical: 10,
+  },
 });

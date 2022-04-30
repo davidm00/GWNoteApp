@@ -1,0 +1,206 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE Contacts(
+contactID INT PRIMARY KEY, -- internal ID, add AUTOINCREMENT if can
+firstName VARCHAR(64),
+middleName VARCHAR(64),
+lastName VARCHAR(64),
+DoB DATE, -- available in MS SQL
+race VARCHAR(32), -- contact's race - probably ENUM from
+                  -- list provided by Goodwill
+sex  VARCHAR(8), -- use "F", "M", and, if needed "Other"
+setting VARCHAR(128), -- check with Goodwill once again what this is
+notes TEXT, -- whatever comments Workers may need to associate
+isDeceased INT, -- MS SQL has BOOL(EAN), but keeping it simple here.
+                -- 0 = currently alive, 1 = contact is deceased
+                -- ask Goodwill if they want some note on cause of 
+                -- death - result of gun violence, or not (e.g.)
+isAtRisk INT, -- MS SQL has BOOL(EAN), but keeping it simple here
+              -- a flag to identify people who SAVE works with
+              -- from other contacts SAVE workers might encounter
+              -- 1 = at risk, 0 = not at risk.
+              -- note: this is a life-time flag. Individual' current
+              -- status may have changed, but if they were a client 
+              -- of Goodwill SAVE this will always be set to 1
+isActive INT  -- This is a dynamic flag. Only check if isAtRisk == 1
+              -- 1 = currently active client
+              -- 0 = current inactive client
+              -- this avoids complex SQL for determining who is currently
+              -- an active client
+);
+CREATE TABLE ContactStatus(
+contactID INT,
+statusUpdateDate DATE, -- date we changed the status of the contact
+status INT, -- 0 = no longer active/not at risk
+            -- 1 = at risk/active client of the program
+note TEXT, -- a note related to the change of status
+workerID, --  worker who changed the status
+PRIMARY KEY(contactID, statusUpdateDate), -- one status change per day allowed
+FOREIGN KEY(contactID) REFERENCES Contacts(contactID),
+FOREIGN KEY(workerID) REFERENCES Workers(workerID)
+);
+CREATE TABLE ContactPhones(
+contactID INT,
+phone VARCHAR(20),
+phoneType VARCHAR(64),
+isCurrent INT,
+PRIMARY KEY(contactID, phone),
+FOREIGN KEY(contactID) REFERENCES Contacts(contactID)
+);
+CREATE TABLE ContactEmails(
+contactID INT,
+email VARCHAR(20),
+emailType VARCHAR(64), 
+isCurrent INT, 
+PRIMARY KEY(contactID, email),
+FOREIGN KEY(contactID) REFERENCES Contacts(contactID)
+);
+CREATE TABLE ContactSocialMedia(
+contactID INT,
+platform VARCHAR(64), -- name of the social media platform
+platformID VARCHAR(64), -- contact's userID on the platform
+PRIMARY KEY (contactID, platform),
+FOREIGN KEY(contactID) REFERENCES Contacts(contactID)
+);
+CREATE TABLE WorkerParticipation(
+activityID INT,
+workerID INT,
+role VARCHAR(256),
+PRIMARY KEY(activityID, workerID),
+FOREIGN KEY(workerID) REFERENCES Workers(workerID),
+FOREIGN KEY(activityID) REFERENCES Activities(activityID)
+);
+CREATE TABLE Groups(
+groupID INT PRIMARY KEY, -- add AUTOINCREMENT if allowed
+name VARCHAR(256) UNIQUE, -- might have to step away from UNIQUE
+shortName VARCHAR(256), -- abbreviated name
+mediaName VARCHAR(256), -- media name (Goodwill knows what it is)
+dateEstablished DATE, -- exact date may not be known, so might need
+                      -- a more forgiving type
+                      -- may need a transaction timestamp too 
+                      -- (date SAVE folks learned about it)
+isActive INT, -- presumably a BOOL value actually:
+              -- 0 = not active, 1 = active
+              -- however, there may be edge cases so additional
+              -- values are possible per Goodwill needs
+isStreetGang INT, -- 1 = street gang, 0 = not a street gang
+description VARCHAR(256),
+notes TEXT,  -- additional notes associated with the group
+);
+CREATE TABLE IncidentType(
+caseID INT,
+incidentType VARCHAR(64), -- incident type tag
+FOREIGN KEY(caseID) REFERENCES Cases(caseID),
+PRIMARY KEY(caseID, incidentType)
+);
+CREATE TABLE IncidentVictims(
+caseID INT,
+victimID INT,
+victimIsDeceased INT,
+victimIsHospitalized INT,
+hospital VARCHAR(128), -- can be empty
+injuryDescription TEXT, -- description of injuries received
+                        -- free form text for now, analytics will have to 
+                        -- parse it
+notes TEXT, -- long form notes
+PRIMARY KEY(caseID, victimID),
+FOREIGN KEY(caseID) REFERENCES Cases(caseID),
+FOREIGN KEY(victimID) REFERENCES Contacts(contactID)
+);
+CREATE TABLE Contact2Case(
+contactID INT,
+caseID INT,
+role VARCHAR(256),
+notes TEXT,
+PRIMARY KEY(contactID, caseID),
+FOREIGN KEY(contactID) REFERENCES Contacts(contactID),
+FOREIGN KEY(caseID) REFERENCES Cases(caseID)
+);
+CREATE TABLE Group2Case(
+groupID INT,
+caseID INT,
+role VARCHAR(256),
+notes TEXT,
+PRIMARY KEY(groupID, caseID),
+FOREIGN KEY(groupID) REFERENCES Groups(groupID),
+FOREIGN KEY(caseID) REFERENCES Cases(caseID)
+);
+CREATE TABLE Referrals(
+referralID INT PRIMARY KEY, -- AUTOINCREMENT if allowed
+source VARCHAR(256), -- org providing the referral
+                     -- possibly an enum, but not clear
+referredBy VARCHAR(256), -- name of a person
+referralType VARCHAR(64), -- possibly an ENUM, check with Goodwill
+referralDate DATE, 
+notes TEXT, -- possibly information provided by the referral source
+contactID INT, -- the person referred
+enteredBy INT, -- worker who received/entered the referral
+referralTimestamp, -- exact time when the entry was made
+FOREIGN KEY(contactID) REFERENCES Contacts(contactID)
+FOREIGN KEY(enteredBy) REFERENCES Workers(workerID)
+);
+CREATE TABLE Referrals2Case(
+caseID INT,
+referralID INT,
+PRIMARY KEY(caseID, referralID),
+FOREIGN KEY(caseID) REFERENCES Cases(caseID),
+FOREIGN KEY(referralID) REFERENCES Referrals(referralID)
+);
+CREATE TABLE SocialServices(
+socialServiceID INT PRIMARY KEY, -- AUTOINCREMENT if possible
+serviceName VARCHAR(256), -- service name
+phone VARCHAR(20), --
+liasonFirstName VARCHAR(64), -- first name of the Goodwill contact 
+liasonLastName VARCHAR(64), -- last name of the Goodwill contact
+email VARCHAR(256), -- service/liason email address
+category VARCHAR(64), -- service category (possibly an ENUM)
+description VARCHAR(256), -- what they do
+streetAddress VARCHAR(256),
+city VARCHAR(64),
+state VARCHAR(2),
+zip VARCHAR(16),
+note TEXT
+);
+CREATE TABLE Activity2Referral(
+activityID INT,
+referralID INT,
+PRIMARY KEY(activityID, referralID),
+FOREIGN KEY(activityID) REFERENCES Activities(activityID),
+FOREIGN KEY(referralID) REFERENCES Referrals(referralID)
+);
+CREATE TABLE WorkerMiles(
+mtID INT,
+workerID INT,
+isDriver INT,  -- 1 = driver, 0 = passenger, 2 = shared
+isVehicleOwner INT, -- 1 = used own vehicle, not certain if needed
+PRIMARY KEY(mtID, workerID),
+FOREIGN KEY(mtID) REFERENCES MilesTravelled(mtID),
+FOREIGN KEY(workerID) REFERENCES Workers(workerID)
+);
+CREATE TABLE ActivityMiles(
+mtID INT,
+activityID,
+PRIMARY KEY(mtID, activityID), -- want to be flexible - same miles 
+-- could have been for multiple events.
+FOREIGN KEY(mtID) REFERENCES MilesTravelled(mtID),
+FOREIGN KEY(activityID) REFERENCES Activities(activityID)
+);
+CREATE TABLE CaseMiles(
+mtID INT,
+caseID,
+PRIMARY KEY(mtID, caseID), -- want to be flexible - same miles 
+-- could have been for multiple cases.
+FOREIGN KEY(mtID) REFERENCES MilesTravelled(mtID),
+FOREIGN KEY(caseID) REFERENCES Cases(caseID)
+);
+CREATE TABLE Workers(
+workerID INT PRIMARY KEY, 
+email VARCHAR(128) NOT NULL UNIQUE,
+firstName VARCHAR(64),
+lastName VARCHAR(64),
+affiliation VARCHAR(128),
+phone VARCHAR(20)
+);
+INSERT INTO Workers VALUES(1,'randomemail1@gmail.com','Akin','Adegoke','West','9292877599');
+INSERT INTO Workers VALUES(2,'test@mail.com','David','Moses','Bloods','5555555555');
+COMMIT;
